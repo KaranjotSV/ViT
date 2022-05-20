@@ -38,7 +38,7 @@ class Patches(layers.Layer):
             rates=[1, 1, 1, 1],
             padding="VALID"
         )
-        print(f'patches: {patches.shape}')
+        # print(f'patches: {patches.shape}')
         patch_dims = patches.shape[-1]  # patches are added depth wise
         patches = tf.reshape(patches, [batch, -1, patch_dims])
         return patches
