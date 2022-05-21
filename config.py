@@ -1,7 +1,7 @@
 learning_rate = 0.001
 weight_decay = 0.0001
 batch = 256
-epochs = 10
+epochs = 20
 image_size = 72
 patch_size = 6
 num_patches = (image_size // patch_size) ** 2

@@ -49,9 +49,9 @@ class Patches(layers.Layer):
 # shifted patch tokenization layer
 class ShiftedPatches(layers.Layer):
     def __init__(self, image_size=image_size, patch_size=patch_size, num_patches=num_patches,
-                 projection_dim=projection_dim, regular=False):
+                 projection_dim=projection_dim, SPT=True):
         super(ShiftedPatches, self).__init__()
-        self.regular = regular
+        self.SPT = SPT
         self.image_size = image_size
         self.patch_size = patch_size
         self.half_patch = patch_size // 2
@@ -94,7 +94,7 @@ class ShiftedPatches(layers.Layer):
         return shift_pad
 
     def call(self, images):
-        if not self.regular:
+        if self.SPT:
             # shifted images with regular images
             images = tf.concat(
                 [
@@ -115,7 +115,7 @@ class ShiftedPatches(layers.Layer):
             padding="VALID"
         )
         patches = self.flatten_patches(patches)
-        if not self.regular:
+        if not self.SPT:
             # layer normalized flat patches
             patches = self.layer_norm(patches)
         '''
@@ -145,13 +145,17 @@ class PatchEncoder(layers.Layer):
 
 # locality self attention - multi head
 class MultiHeadLSA(layers.MultiHeadAttention):
-    def __init__(self, **kwargs):
+    def __init__(self, TRAIN_TAU=True, **kwargs):
         super().__init__(**kwargs)
-        # trainable temperature term, initial value equal to root of key dimension
-        self.temp = tf.Variable(math.sqrt(float(self._key_dim)), trainable=True)
+        # flag for trainable temperature
+        self.TRAIN_TAU = TRAIN_TAU
+        if self.TRAIN_TAU:
+            # trainable temperature, initial value equal to root of key dimension
+            self.tau = tf.Variable(math.sqrt(float(self._key_dim)), trainable=True)
 
     def compute(self, query, key, value, attn_mask=None, training=None):
-        query = tf.multiply(query, 1.0 / self.temp)
+        if self.TRAIN_TAU:
+            query = tf.multiply(query, 1.0 / self.tau)
         attn_scores = tf.einsum(self._dot_product_equation, key, query)
         attn_scores = self._masked_softmax(attn_scores, attn_mask)
         attn_scores_dropout = self._dropout_layer(

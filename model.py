@@ -1,5 +1,7 @@
-import numpy as np
-import tensorflow as tf
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow_addons as tfa
@@ -16,10 +18,11 @@ print(f'training: {x_train.shape} - labels: {y_train.shape}')
 print(f'testing: {x_test.shape} - labels: {y_test.shape}')
 
 
-def create_ViT(regular=False):
+def create_ViT(SPT=True, LSA=True, MASKING=True, TRAIN_TAU=True):
+    print(f'training - SPT: {SPT}, LSA: {LSA}, MASKING: {MASKING}, TRAIN_TAU: {TRAIN_TAU}')
     inputs = layers.Input(in_shape)
     augmented = augmentation(inputs)  # augment data
-    patches = ShiftedPatches(regular=regular)(augmented)  # create patches
+    patches = ShiftedPatches(SPT=SPT)(augmented)  # create patches
     encoded_patches = PatchEncoder(num_patches, projection_dim)(patches)  # encode patches
 
     # create multiple layers of transformer block
@@ -27,10 +30,15 @@ def create_ViT(regular=False):
         # normalization 1
         x1 = layers.LayerNormalization(epsilon=1e-6)(encoded_patches)
         # create a multi-head attention layer
-        if not regular:
-            attn_output = MultiHeadLSA(
-                num_heads=num_heads, key_dim=projection_dim, dropout=0.1
-            )(x1, x1, attention_mask=diag_attn_mask)
+        if LSA and (MASKING or TRAIN_TAU):
+            if MASKING:
+                attn_output = MultiHeadLSA(
+                    num_heads=num_heads, key_dim=projection_dim, TRAIN_TAU=TRAIN_TAU, dropout=0.1
+                )(x1, x1, attention_mask=diag_attn_mask)
+            elif not MASKING:
+                attn_output = MultiHeadLSA(
+                    num_heads=num_heads, key_dim=projection_dim, TRAIN_TAU=TRAIN_TAU, dropout=0.1
+                )(x1, x1)
         else:
             attn_output = layers.MultiHeadAttention(
                 num_heads=num_heads, key_dim=projection_dim, dropout=0.1
