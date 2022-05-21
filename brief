@@ -1,4 +1,13 @@
-The paper focuses upon tackling the problem of low locality inductive bias in Vision Transformers(ViTs), this lack of inductive bias makes it difficult for ViTs to perform on small-size datasets such as Tiny-ImageNet and CIFAR-100, etc. when trained from scratch. The authors proposed two generic add-on modules which can easily be applied to various ViTs - Shifted Patch Tokenization(SPT) and Locality Self-Attention(LSA), these have proven to improve the performance of ViT based network architectures by an average of 2.96% on small-size datasets.
-The authors identified two problems which result in decreased locality inductive bias in ViTs i.e. poor tokenization and attention mechanism. The division of a given image into non-overlapping patches of equal size followed by their linear projection to visual tokens by application of same linear projection to each patch makes them have a relatively small receptive field as compared to overlapping patches. This results in insufficient embedding of spatial relationship with adjacent pixels in each visual token. The other identified problem is that ViTs cannot attend locally to important visual tokens because of the inevitably large number of embedded tokens.
-Among the two solutions presented by the authors, SPT aims at utilising the spatial relations between neighbouring pixels in the tokenization process which is achieved by concatenating spatially shifted images together with the input image, which gives a wider receptive field than standard tokenization. Whereas, LSA gets rid of the smoothing phenomenon of attention score distribution by masking self-tokens and applying learnable temperature to the softmax function in contrast to scaling by a constant in case of original self-attention mechanism.
-
+The paper focuses upon tackling the problem of low locality inductive bias in Vision Transformers(ViTs), this lack of inductive bias makes it difficult for 
+ViTs to perform on small-size datasets such as Tiny-ImageNet and CIFAR-100, etc. when trained from scratch. The authors proposed two generic add-on modules 
+which can easily be applied to various ViTs - Shifted Patch Tokenization(SPT) and Locality Self-Attention(LSA), these have proven to improve the performance 
+of ViT based network architectures by an average of 2.96% on small-size datasets.
+The authors identified two problems which result in decreased locality inductive bias in ViTs i.e. poor tokenization and attention mechanism. The division 
+of a given image into non-overlapping patches of equal size followed by their linear projection to visual tokens by application of same linear projection 
+to each patch makes them have a relatively small receptive field as compared to overlapping patches. This results in insufficient embedding of spatial 
+relationship with adjacent pixels in each visual token. The other identified problem is that ViTs cannot attend locally to important visual tokens because 
+of the inevitably large number of embedded tokens.
+Among the two solutions presented by the authors, SPT aims at utilising the spatial relations between neighbouring pixels in the tokenization process which 
+is achieved by concatenating spatially shifted images together with the input image, which gives a wider receptive field than standard tokenization. 
+Whereas, LSA gets rid of the smoothing phenomenon of attention score distribution by masking self-tokens and applying learnable temperature to the softmax 
+function in contrast to scaling by a constant in case of original self-attention mechanism.
