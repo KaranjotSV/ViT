@@ -7,6 +7,7 @@ patch_size = 6
 num_patches = (image_size // patch_size) ** 2
 projection_dim = 64
 num_heads = 4  # multi-head attention
+layer_norm = 1e-6
 
 transformer_units = [projection_dim * 2,  projection_dim]  # size of transformer layers
 transformer_layers = 8
