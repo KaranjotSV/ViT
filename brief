@@ -11,4 +11,3 @@ Among the two solutions presented by the authors, SPT aims at utilising the spat
 is achieved by concatenating spatially shifted images together with the input image, which gives a wider receptive field than standard tokenization. 
 Whereas, LSA gets rid of the smoothing phenomenon of attention score distribution by masking self-tokens and applying learnable temperature to the softmax 
 function in contrast to scaling by a constant in case of original self-attention mechanism.
-
