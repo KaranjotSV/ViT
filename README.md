@@ -1,4 +1,4 @@
-### ViT
+## ViT
 performance of ViT extended with SPT and LSA on CIFAR-100, trained for 20 epochs
 
 | model  | top-1 accuracy (%) |
