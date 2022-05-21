@@ -57,7 +57,7 @@ class ShiftedPatches(layers.Layer):
         self.half_patch = patch_size // 2
         self.flatten_patches = layers.Reshape((num_patches, -1))
         self.projection = layers.Dense(units=projection_dim)
-        self.layer_norm = layers.LayerNormalization(layer_norm)
+        self.layer_norm = layers.LayerNormalization(epsilon=1e-6)
 
     def crop_shift_pad(self, images, mode):
         # diagonally shifted images
@@ -106,25 +106,25 @@ class ShiftedPatches(layers.Layer):
                 ],
                 axis=-1
             )
-            # flattened pacthes
-            patches = tf.image.extract_patches(
-                images,
-                sizes=[1, self.patch_size, self.patch_size, 1],
-                strides=[1, self.patch_size, self.patch_size, 1],
-                rates=[1, 1, 1, 1],
-                padding="VALID"
-            )
-            patches = self.flatten_patches(patches)
-            if not self.regular:
-                # layer normalized flat patches
-                patches = self.layer_norm(patches)
-            '''
-                tokens = self.projection(tokens)
-            else:
-                # linearly projected flat patches
-                tokens = self.projection(flat_patches)
-            '''
-            return patches
+        # flattened pacthes
+        patches = tf.image.extract_patches(
+            images,
+            sizes=[1, self.patch_size, self.patch_size, 1],
+            strides=[1, self.patch_size, self.patch_size, 1],
+            rates=[1, 1, 1, 1],
+            padding="VALID"
+        )
+        patches = self.flatten_patches(patches)
+        if not self.regular:
+            # layer normalized flat patches
+            patches = self.layer_norm(patches)
+        '''
+            tokens = self.projection(tokens)
+        else:
+            # linearly projected flat patches
+            tokens = self.projection(flat_patches)
+        '''
+        return patches
 
 
 # patch encoding layer
@@ -145,8 +145,8 @@ class PatchEncoder(layers.Layer):
 
 # locality self attention - multi head
 class MultiHeadLSA(layers.MultiHeadAttention):
-    def __init__(self):
-        super(MultiHeadLSA, self).__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         # trainable temperature term, initial value equal to root of key dimension
         self.temp = tf.Variable(math.sqrt(float(self._key_dim)), trainable=True)
 
